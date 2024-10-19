@@ -4,34 +4,20 @@ const app = express();
 const port = 3000;
 
 // 连接到 MongoDB
-mongoose.connect('mongodb+srv://admin:84D43fhv.ht^J@clusterdev.mjmep.mongodb.net/sensor_data', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-}).then(async () => {
-  console.log('Connected to MongoDB');
-  
-  // 检查集合是否存在，避免重复创建
-  const collections = await mongoose.connection.db.listCollections({ name: 'sensordatas' }).toArray();
-  if (collections.length === 0) {
-    // 创建时序集合
-    await mongoose.connection.db.createCollection('sensordatas', {
-      timeseries: {
-        timeField: 'timestamp', // 用于存储时间的字段
-        metaField: 'metadata',  // 可选的元数据字段
-        granularity: 'minutes'  // 数据粒度: 'seconds', 'minutes', 或 'hours'
-      }
-    });
-    console.log('Time-series collection created');
-  } else {
-    console.log('Time-series collection already exists');
-  }
-  
-}).catch((err) => {
-  console.error('Error connecting to MongoDB', err);
-});
+mongoose.connect('mongodb+srv://admin:84D43fhv.ht^J@clusterdev.mjmep.mongodb.net/sensor_data')
+  .then(() => {
+    console.log('Connected to MongoDB');
+  })
+  .catch((err) => {
+    console.error('Error connecting to MongoDB', err);
+  });
 
-// 定义时序数据的Schema
+// 定义时序数据的 Schema，包含传感器编号
 const sensorSchema = new mongoose.Schema({
+  sensorId: {
+    type: String,
+    required: true,
+  },
   timestamp: {
     type: Date,
     default: Date.now,
@@ -44,11 +30,17 @@ const sensorSchema = new mongoose.Schema({
 // 创建模型
 const SensorData = mongoose.model('SensorData', sensorSchema);
 
+// 生成 6 位数字编号的函数
+function generateSensorId() {
+  return 660090;
+}
+
 // 模拟传感器生成数据的函数
 function generateSensorData() {
   const temperature = (Math.random() * 15 + 20).toFixed(2); // 生成 20 到 35 之间的随机温度
   const humidity = (Math.random() * 30 + 40).toFixed(2);    // 生成 40 到 70 之间的随机湿度
-  return { temperature, humidity };
+  const sensorId = generateSensorId(); // 生成6位传感器编号
+  return { sensorId, temperature, humidity };
 }
 
 // 每分钟发送一次数据到 MongoDB
@@ -58,7 +50,7 @@ setInterval(async () => {
 
   try {
     await sensorData.save();
-    console.log(`Saved data: Temperature: ${data.temperature}°C, Humidity: ${data.humidity}%`);
+    console.log(`Saved data from sensor ${data.sensorId}: Temperature: ${data.temperature}°C, Humidity: ${data.humidity}%`);
   } catch (err) {
     console.error('Error saving sensor data', err);
   }
