@@ -50,7 +50,7 @@ const mqttClient = mqtt.connect(connectUrl, {
     "jnMO/eHbB1bPYpTn4OOdfeMFTYAyBdeEusCgTi7yXR+GK2dXDX8UikqjD2k/RvvgH02u/XnZ9vLj2Bh1ycOt1g==",
   reconnectPeriod: 1000,
 });
-const topic = "C1M/660090";
+const topic = "C1M/#";
 
 mqttClient.on("connect", () => {
   console.log(`Connected to MQTT broker, subscribing to topic: ${topic}`);
@@ -62,7 +62,12 @@ mqttClient.on("connect", () => {
 });
 
 mqttClient.on("message", async (receivedTopic, message) => {
-  if (receivedTopic === topic) {
+  console.log(`Received message from topic: ${receivedTopic}`)
+  const deviceTopicPattern = /^C1M\/(6\d{5})$/; // 匹配 C1M/600000 到 C1M/699999
+  const match = receivedTopic.match(deviceTopicPattern);
+  if (match) {
+    const deviceNumber = match[1]; // 提取设备号
+    console.log(`Received data from device: ${deviceNumber}`);
     try {
       // 尝试将 Buffer 直接转换为字符串
       const jsonString = message.toString("utf8");
@@ -76,7 +81,7 @@ mqttClient.on("message", async (receivedTopic, message) => {
           const decompressedData = result.toString();
           // 在这里可以将 jsonData 保存到 MongoDB
           const sensorData = new SensorData({
-            sensorId: "660090",
+            sensorId: deviceNumber,
             timestamp: new Date(),
             data: decompressedData,
           });
