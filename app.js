@@ -17,31 +17,31 @@ mongoose
     console.error("Error connecting to MongoDB", err);
   });
 
-  // mongoose.connect('mongodb+srv://admin:84D43fhv.ht^J@clusterdev.mjmep.mongodb.net/sensor_data', {
-  //   useNewUrlParser: true,
-  //   useUnifiedTopology: true,
-  // }).then(async () => {
-  //   console.log('Connected to MongoDB');
-    
-  //   // 检查集合是否存在，避免重复创建
-  //   const collections = await mongoose.connection.db.listCollections({ name: 'sensordatas' }).toArray();
-  //   if (collections.length === 0) {
-  //     // 创建时序集合
-  //     await mongoose.connection.db.createCollection('sensordatas', {
-  //       timeseries: {
-  //         timeField: 'timestamp', // 用于存储时间的字段
-  //         metaField: 'metadata',  // 可选的元数据字段
-  //         granularity: 'minutes'  // 数据粒度: 'seconds', 'minutes', 或 'hours'
-  //       }
-  //     });
-  //     console.log('Time-series collection created');
-  //   } else {
-  //     console.log('Time-series collection already exists');
-  //   }
-    
-  // }).catch((err) => {
-  //   console.error('Error connecting to MongoDB', err);
-  // });
+// mongoose.connect('mongodb+srv://admin:84D43fhv.ht^J@clusterdev.mjmep.mongodb.net/sensor_data', {
+//   useNewUrlParser: true,
+//   useUnifiedTopology: true,
+// }).then(async () => {
+//   console.log('Connected to MongoDB');
+
+//   // 检查集合是否存在，避免重复创建
+//   const collections = await mongoose.connection.db.listCollections({ name: 'sensordatas' }).toArray();
+//   if (collections.length === 0) {
+//     // 创建时序集合
+//     await mongoose.connection.db.createCollection('sensordatas', {
+//       timeseries: {
+//         timeField: 'timestamp', // 用于存储时间的字段
+//         metaField: 'metadata',  // 可选的元数据字段
+//         granularity: 'minutes'  // 数据粒度: 'seconds', 'minutes', 或 'hours'
+//       }
+//     });
+//     console.log('Time-series collection created');
+//   } else {
+//     console.log('Time-series collection already exists');
+//   }
+
+// }).catch((err) => {
+//   console.error('Error connecting to MongoDB', err);
+// });
 
 // 定义动态结构的 Schema，存储不确定的 JSON 数据
 const sensorSchema = new mongoose.Schema({
@@ -88,7 +88,7 @@ mqttClient.on("connect", () => {
 });
 
 mqttClient.on("message", async (receivedTopic, message) => {
-  console.log(`Received message from topic: ${receivedTopic}`)
+  console.log(`Received message from topic: ${receivedTopic}`);
   const deviceTopicPattern = /^C1M\/(6\d{5})$/; // 匹配 C1M/600000 到 C1M/699999
   const match = receivedTopic.match(deviceTopicPattern);
   if (match) {
